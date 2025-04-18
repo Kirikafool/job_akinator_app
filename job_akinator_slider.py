@@ -1,11 +1,9 @@
-
-
 import streamlit as st
 import pandas as pd
 
 # CSV読み込み
 df = pd.read_csv("shindan_graph.csv")
-questions = df.iloc[:, 0].tolist()
+questions = df.iloc[:, 0].dropna().tolist()  # 空行・NaNを除去
 job_columns = df.columns[1:]
 
 st.set_page_config(page_title="職業診断アプリ", page_icon="🧠")
@@ -14,10 +12,10 @@ st.write("以下の10問にスライダーで回答すると、あなたに向�
 
 user_scores = []
 
-# 質問フォーム（修正版）
+# 質問フォーム
 with st.form("questionnaire_form"):
     for i, q in enumerate(questions):
-        clean_q = str(q).split("\n")[0]  # 質問の冒頭1行だけ表示
+        clean_q = str(q).split("\n")[0]  # 質問冒頭だけ使用
         score = st.slider(label=clean_q, min_value=1, max_value=10, value=5, key=f"q{i}")
         user_scores.append(score)
 
