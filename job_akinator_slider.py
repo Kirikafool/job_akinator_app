@@ -1,4 +1,5 @@
 
+
 import streamlit as st
 import pandas as pd
 
@@ -16,7 +17,7 @@ user_scores = []
 # 質問フォーム（修正版）
 with st.form("questionnaire_form"):
     for i, q in enumerate(questions):
-        clean_q = q.split("\n")[0]  # 質問の冒頭1行だけ表示
+        clean_q = str(q).split("\n")[0]  # 質問の冒頭1行だけ表示
         score = st.slider(label=clean_q, min_value=1, max_value=10, value=5, key=f"q{i}")
         user_scores.append(score)
 
