@@ -1,42 +1,34 @@
-
 import streamlit as st
 import pandas as pd
 import re
 
+# ✅ ページ設定（最初に書く！）
+st.set_page_config(page_title="職業診断アプリ", page_icon="🧠")
 
-# データ読み込み
+# ✅ パスワード認証（最初に必ず通す）
+PASSWORD = "secret123"  # ← お好きなパスワードに変更OK
+password_input = st.text_input("🔒 パスワードを入力してください", type="password")
+if password_input != PASSWORD:
+    st.warning("パスワードが必要です")
+    st.stop()
+
+# ✅ CSV読み込み
 df = pd.read_csv("shindan_graph.csv")
-url_df = pd.read_csv("url.csv")  # 本部名とURLの対応表
-
+url_df = pd.read_csv("url.csv")
 questions = df.iloc[:, 0].dropna().tolist()
 job_columns = df.columns[1:]
 
-st.set_page_config(page_title="職業診断アプリ", page_icon="🧠")
-
-# 🔐 パスワード制御
-PASSWORD = "secret123"  # ←ここを好きなパスワードに変更
-password_input = st.text_input("🔒 パスワードを入力してください", type="password")
-if password_input != PASSWORD:
-    st.warning("パスワードが必要です")
-    st.stop()
-    
+# ✅ タイトル表示
 st.title("🧠 職業アキネーター - 正規化スライダー診断版")
 st.write("以下の10問にスライダーで回答すると、あなたに向いている本部がわかります！")
 
-# 🔐 パスワード制御
-PASSWORD = "secret123"  # ←ここを好きなパスワードに変更
-password_input = st.text_input("🔒 パスワードを入力してください", type="password")
-if password_input != PASSWORD:
-    st.warning("パスワードが必要です")
-    st.stop()
-
 user_scores = []
 
-# （〜）内の補足を削除
+# ✅ ()の補足テキストを消す関数
 def remove_tilde_text(text):
     return re.sub(r"\(.*?\)", "", text).strip()
 
-# 質問フォーム
+# ✅ 質問フォーム
 with st.form("questionnaire_form"):
     for i, q in enumerate(questions):
         full_q = str(q).strip()
@@ -60,11 +52,11 @@ with st.form("questionnaire_form"):
 
     submitted = st.form_submit_button("診断する")
 
-# 診断ロジック
+# ✅ 診断ロジック & 出力
 if submitted:
     total_scores = dict.fromkeys(job_columns, 0.0)
     for i, raw_score in enumerate(user_scores):
-        normalized_score = (raw_score - 5.5) / 4.5  # 正規化: -1 〜 +1
+        normalized_score = (raw_score - 5.5) / 4.5  # 1〜10を-1〜+1に正規化
         for job in job_columns:
             weight = df.loc[i, job]
             total_scores[job] += normalized_score * float(weight)
@@ -72,8 +64,9 @@ if submitted:
     sorted_scores = sorted(total_scores.items(), key=lambda x: x[1], reverse=True)
     top3 = [job for job, score in sorted_scores[:3]]
 
-    # 横並びで本部名表示
     st.subheader("🎯 あなたに合っている本部はこちら")
+
+    # TOP3 横並びで表示
     col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown(f"<div style='text-align:center; font-size:20px; font-weight:bold;'>{top3[0]}</div>", unsafe_allow_html=True)
@@ -82,7 +75,7 @@ if submitted:
     with col3:
         st.markdown(f"<div style='text-align:center; font-size:20px; font-weight:bold;'>{top3[2]}</div>", unsafe_allow_html=True)
 
-    # 各本部のリンクを表示
+    # 対応するURLをリンク表示
     st.write("### 🔗 各本部の詳細はこちら：")
     for dept in top3:
         match = url_df[url_df.iloc[:, 0] == dept]
