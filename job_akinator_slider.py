@@ -3,7 +3,7 @@ import pandas as pd
 
 # CSV読み込み
 df = pd.read_csv("shindan_graph.csv")
-questions = df.iloc[:, 0].dropna().tolist()  # 空行・NaNを除去
+questions = df.iloc[:, 0].dropna().tolist()
 job_columns = df.columns[1:]
 
 st.set_page_config(page_title="職業診断アプリ", page_icon="🧠")
@@ -12,16 +12,17 @@ st.write("以下の10問にスライダーで回答すると、あなたに向�
 
 user_scores = []
 
-# 質問フォーム
 with st.form("questionnaire_form"):
     for i, q in enumerate(questions):
-        clean_q = str(q).split("\n")[0]  # 質問冒頭だけ使用
-        score = st.slider(label=clean_q, min_value=1, max_value=10, value=5, key=f"q{i}")
+        full_q = str(q).strip()
+        title_line = full_q.split("\\n")[0] if "\\n" in full_q else full_q.split("\n")[0]
+        st.markdown(f"**Q{i+1}.**<br>{full_q}", unsafe_allow_html=True)
+        score = st.slider(label=title_line, min_value=1, max_value=10, value=5, key=f"q{i}")
         user_scores.append(score)
+        st.markdown("---")
 
     submitted = st.form_submit_button("診断する")
 
-# 結果表示
 if submitted:
     total_scores = dict.fromkeys(job_columns, 0.0)
     for i, user_score in enumerate(user_scores):
