@@ -3,6 +3,13 @@ import streamlit as st
 import pandas as pd
 import re
 
+# 🔐 パスワード制御
+PASSWORD = "secret123"  # ←ここを好きなパスワードに変更
+password_input = st.text_input("🔒 パスワードを入力してください", type="password")
+if password_input != PASSWORD:
+    st.warning("パスワードが必要です")
+    st.stop()
+
 # データ読み込み
 df = pd.read_csv("shindan_graph.csv")
 url_df = pd.read_csv("url.csv")  # 本部名とURLの対応表
