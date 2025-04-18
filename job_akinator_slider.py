@@ -15,10 +15,23 @@ user_scores = []
 with st.form("questionnaire_form"):
     for i, q in enumerate(questions):
         full_q = str(q).strip()
-        title_line = full_q.split("\\n")[0] if "\\n" in full_q else full_q.split("\n")[0]
-        st.markdown(f"**Q{i+1}.**<br>{full_q}", unsafe_allow_html=True)
-        score = st.slider(label=title_line, min_value=1, max_value=10, value=5, key=f"q{i}")
-        user_scores.append(score)
+        lines = full_q.split("\n")
+        title = lines[0] if len(lines) > 0 else ""
+        label_1 = lines[1] if len(lines) > 1 else "1"
+        label_10 = lines[2] if len(lines) > 2 else "10"
+
+        # 質問全文表示
+        st.markdown(f"**Q{i+1}.** {title}")
+        st.slider(label="", min_value=1, max_value=10, value=5, key=f"q{i}")
+        user_scores.append(st.session_state[f"q{i}"])
+
+        # 左右にラベルを表示
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown(f"⬅️ 1：{label_1}")
+        with col2:
+            st.markdown(f"<div style='text-align: right;'>10：{label_10} ➡️</div>", unsafe_allow_html=True)
+
         st.markdown("---")
 
     submitted = st.form_submit_button("診断する")
