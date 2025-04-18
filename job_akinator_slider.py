@@ -19,8 +19,8 @@ questions = df.iloc[:, 0].dropna().tolist()
 job_columns = df.columns[1:]
 
 # ✅ タイトル表示
-st.title("🧠 職業アキネーター - 正規化スライダー診断版")
-st.write("以下の10問にスライダーで回答すると、あなたに向いている本部がわかります！")
+st.title("🧠 あなたに合う本部はどれ？")
+st.write("以下の10問にスライダーで回答すると、あなたに向いている本部の部署がわかります！")
 
 user_scores = []
 
