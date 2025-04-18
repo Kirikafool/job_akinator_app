@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import re
 
 # CSV読み込み
 df = pd.read_csv("shindan_graph.csv")
@@ -12,14 +13,18 @@ st.write("以下の10問にスライダーで回答すると、あなたに向�
 
 user_scores = []
 
+# （〜）内のテキストを削除する関数
+def remove_tilde_text(text):
+    return re.sub(r"\(.*?\)", "", text).strip()
+
 with st.form("questionnaire_form"):
     for i, q in enumerate(questions):
         full_q = str(q).strip()
         lines = full_q.split("\n")
 
         title = lines[0] if len(lines) > 0 else ""
-        label_1 = lines[1] if len(lines) > 1 else "1"
-        label_10 = lines[2] if len(lines) > 2 else "10"
+        label_1 = remove_tilde_text(lines[1]) if len(lines) > 1 else "1"
+        label_10 = remove_tilde_text(lines[2]) if len(lines) > 2 else "10"
 
         st.markdown(f"**Q{i+1}.** {title}")
         score = st.slider(label="", min_value=1, max_value=10, value=5, key=f"q{i}")
@@ -35,6 +40,7 @@ with st.form("questionnaire_form"):
 
     submitted = st.form_submit_button("診断する")
 
+# 結果表示
 if submitted:
     total_scores = dict.fromkeys(job_columns, 0.0)
     for i, user_score in enumerate(user_scores):
