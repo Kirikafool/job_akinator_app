@@ -21,24 +21,20 @@ with st.form("questionnaire_form"):
         label_1 = lines[1] if len(lines) > 1 else "1"
         label_10 = lines[2] if len(lines) > 2 else "10"
 
-        # 質問タイトル表示
         st.markdown(f"**Q{i+1}.** {title}")
-        # スライダー表示（ラベルなし）
         score = st.slider(label="", min_value=1, max_value=10, value=5, key=f"q{i}")
         user_scores.append(score)
 
-        # スライダー下に左右ラベル表示
         col1, col2 = st.columns(2)
         with col1:
-            st.markdown(f"⬅️ **{label_1}**")
+            col1.markdown(f"<div style='font-weight:bold;'>⬅️ {label_1}</div>", unsafe_allow_html=True)
         with col2:
-            st.markdown(f"<div style='text-align: right;'>**{label_10}** ➡️</div>", unsafe_allow_html=True)
+            col2.markdown(f"<div style='text-align:right; font-weight:bold;'>{label_10} ➡️</div>", unsafe_allow_html=True)
 
         st.markdown("---")
 
     submitted = st.form_submit_button("診断する")
 
-# 結果表示
 if submitted:
     total_scores = dict.fromkeys(job_columns, 0.0)
     for i, user_score in enumerate(user_scores):
