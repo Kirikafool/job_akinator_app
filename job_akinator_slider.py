@@ -12,6 +12,14 @@ questions = df.iloc[:, 0].dropna().tolist()
 job_columns = df.columns[1:]
 
 st.set_page_config(page_title="職業診断アプリ", page_icon="🧠")
+
+# 🔐 パスワード制御
+PASSWORD = "secret123"  # ←ここを好きなパスワードに変更
+password_input = st.text_input("🔒 パスワードを入力してください", type="password")
+if password_input != PASSWORD:
+    st.warning("パスワードが必要です")
+    st.stop()
+    
 st.title("🧠 職業アキネーター - 正規化スライダー診断版")
 st.write("以下の10問にスライダーで回答すると、あなたに向いている本部がわかります！")
 
