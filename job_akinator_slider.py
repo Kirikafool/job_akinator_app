@@ -2,33 +2,31 @@ import streamlit as st
 import pandas as pd
 import re
 
-# ✅ ページ設定（最初に書く！）
-st.set_page_config(page_title="職業診断アプリ", page_icon="🧠")
+st.set_page_config(page_title="CA インターネット広告事業本部適正診断", page_icon="📝")
 
-# ✅ パスワード認証（最初に必ず通す）
-PASSWORD = "secret123"  # ← お好きなパスワードに変更OK
+# パスワード認証
+PASSWORD = "CAadagency"
 password_input = st.text_input("🔒 パスワードを入力してください", type="password")
 if password_input != PASSWORD:
     st.warning("パスワードが必要です")
     st.stop()
 
-# ✅ CSV読み込み
+# データ読み込み
 df = pd.read_csv("shindan_graph.csv")
 url_df = pd.read_csv("url.csv")
 questions = df.iloc[:, 0].dropna().tolist()
 job_columns = df.columns[1:]
 
-# ✅ タイトル表示
-st.title("🧠 あなたに合う本部はどれ？")
-st.write("以下の10問にスライダーで回答すると、あなたに向いている本部の部署がわかります！")
+st.title("🧠 あなたに合う部署はどれ？")
+st.write("以下の10問に回答すると、あなたに向いている本部の部署がわかります！")
 
 user_scores = []
 
-# ✅ ()の補足テキストを消す関数
+# ()の補足を削除
 def remove_tilde_text(text):
     return re.sub(r"\(.*?\)", "", text).strip()
 
-# ✅ 質問フォーム
+# 質問表示
 with st.form("questionnaire_form"):
     for i, q in enumerate(questions):
         full_q = str(q).strip()
@@ -52,21 +50,20 @@ with st.form("questionnaire_form"):
 
     submitted = st.form_submit_button("診断する")
 
-# ✅ 診断ロジック & 出力
+# 診断ロジック
 if submitted:
     total_scores = dict.fromkeys(job_columns, 0.0)
     for i, raw_score in enumerate(user_scores):
-        normalized_score = (raw_score - 5.5) / 4.5  # 1〜10を-1〜+1に正規化
+        normalized_score = (raw_score - 5.5) / 4.5  # スコア正規化
         for job in job_columns:
-            weight = df.loc[i, job]
-            total_scores[job] += normalized_score * float(weight)
+            raw_weight = df.loc[i, job]
+            normalized_weight = (float(raw_weight) - 5.5) / 4.5  # 重みも正規化！
+            total_scores[job] += normalized_score * normalized_weight
 
     sorted_scores = sorted(total_scores.items(), key=lambda x: x[1], reverse=True)
     top3 = [job for job, score in sorted_scores[:3]]
 
-    st.subheader("🎯 あなたに合っている本部はこちら")
-
-    # TOP3 横並びで表示
+    st.subheader("🎯 あなたに合っている部署はこちら")
     col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown(f"<div style='text-align:center; font-size:20px; font-weight:bold;'>{top3[0]}</div>", unsafe_allow_html=True)
@@ -75,8 +72,7 @@ if submitted:
     with col3:
         st.markdown(f"<div style='text-align:center; font-size:20px; font-weight:bold;'>{top3[2]}</div>", unsafe_allow_html=True)
 
-    # 対応するURLをリンク表示
-    st.write("### 🔗 各本部の詳細はこちら：")
+    st.write("### 🔗 各部署の詳細はこちら：")
     for dept in top3:
         match = url_df[url_df.iloc[:, 0] == dept]
         if not match.empty:
