@@ -17,7 +17,7 @@ url_df = pd.read_csv("url.csv")
 questions = df.iloc[:, 0].dropna().tolist()
 job_columns = df.columns[1:]
 
-st.title("🧠 あなたに合う部署はどれ？")
+st.title("💻 あなたに合う部署はどれ？")
 st.write("以下の10問に回答すると、あなたに向いている本部の部署がわかります！")
 
 user_scores = []
